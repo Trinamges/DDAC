@@ -7,24 +7,34 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DDAC3.Models;
 
-namespace DDAC3.Views.Orders
+namespace DDAC3.Controllers.Books
 {
-    public class OrdersController : Controller
+    public class BooksController : Controller
     {
         private readonly DDAC3Context _context;
 
-        public OrdersController(DDAC3Context context)
+        public BooksController(DDAC3Context context)
         {
             _context = context;
         }
 
-        // GET: Orders
-        public async Task<IActionResult> Index()
+        public string SearchString { get; set; }
+
+        // GET: Books
+        public async Task<IActionResult> Index(string SearchString)
         {
-            return View(await _context.Order.ToListAsync());
+            var books = from m in _context.Book
+                        select m;
+
+            if(!String.IsNullOrEmpty(SearchString))
+            {
+                books = books.Where(s => s.BookName.Contains(SearchString));
+            }
+
+            return View(await books.ToListAsync());
         }
 
-        // GET: Orders/Details/5
+        // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -32,39 +42,41 @@ namespace DDAC3.Views.Orders
                 return NotFound();
             }
 
-            var order = await _context.Order
+            var book = await _context.Book
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (order == null)
+            if (book == null)
             {
                 return NotFound();
             }
 
-            return View(order);
+            return View(book);
         }
 
-        // GET: Orders/Create
+        // GET: Books/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Orders/Create
+        // POST: Books/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,BooksID,Quantity,Total")] Order order)
+        public async Task<IActionResult> Create([Bind("ID,BookName,Author,Price,Quantity")] Book book)
         {
+
+
             if (ModelState.IsValid)
             {
-                _context.Add(order);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(order);
+            return View(book);
         }
 
-        // GET: Orders/Edit/5
+        // GET: Books/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -72,22 +84,22 @@ namespace DDAC3.Views.Orders
                 return NotFound();
             }
 
-            var order = await _context.Order.FindAsync(id);
-            if (order == null)
+            var book = await _context.Book.FindAsync(id);
+            if (book == null)
             {
                 return NotFound();
             }
-            return View(order);
+            return View(book);
         }
 
-        // POST: Orders/Edit/5
+        // POST: Books/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,BooksID,Quantity,Total")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,BookName,Author,Price,Quantity")] Book book)
         {
-            if (id != order.ID)
+            if (id != book.ID)
             {
                 return NotFound();
             }
@@ -96,12 +108,12 @@ namespace DDAC3.Views.Orders
             {
                 try
                 {
-                    _context.Update(order);
+                    _context.Update(book);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!OrderExists(order.ID))
+                    if (!BookExists(book.ID))
                     {
                         return NotFound();
                     }
@@ -112,10 +124,10 @@ namespace DDAC3.Views.Orders
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(order);
+            return View(book);
         }
 
-        // GET: Orders/Delete/5
+        // GET: Books/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -123,30 +135,30 @@ namespace DDAC3.Views.Orders
                 return NotFound();
             }
 
-            var order = await _context.Order
+            var book = await _context.Book
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (order == null)
+            if (book == null)
             {
                 return NotFound();
             }
 
-            return View(order);
+            return View(book);
         }
 
-        // POST: Orders/Delete/5
+        // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var order = await _context.Order.FindAsync(id);
-            _context.Order.Remove(order);
+            var book = await _context.Book.FindAsync(id);
+            _context.Book.Remove(book);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool OrderExists(int id)
+        private bool BookExists(int id)
         {
-            return _context.Order.Any(e => e.ID == id);
+            return _context.Book.Any(e => e.ID == id);
         }
     }
 }

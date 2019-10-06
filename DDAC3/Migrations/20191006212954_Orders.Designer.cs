@@ -3,14 +3,16 @@ using DDAC3.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DDAC3.Migrations
 {
     [DbContext(typeof(DDAC3Context))]
-    partial class DDAC3ContextModelSnapshot : ModelSnapshot
+    [Migration("20191006212954_Orders")]
+    partial class Orders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,8 +47,6 @@ namespace DDAC3.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("BooksName");
-
-                    b.Property<string>("CustomerName");
 
                     b.Property<int>("Quantity");
 
