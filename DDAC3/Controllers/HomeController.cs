@@ -12,19 +12,21 @@ namespace DDAC3.Controllers
     {
         public IActionResult Index()
         {
+
+            ViewData["Message"] = "Welcome to the Book Management System";
             return View();
         }
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
+            ViewData["Message"] = "This is the Book Management System that helps manage book stock and orders";
 
             return View();
         }
 
         public IActionResult Contact()
         {
-            ViewData["Message"] = "Your contact page.";
+            ViewData["Message"] = "Contact Details";
 
             return View();
         }

@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DDAC3.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DDAC3.Controllers.Books
 {
+    [Authorize]
     public class BooksController : Controller
     {
         private readonly DDAC3Context _context;
