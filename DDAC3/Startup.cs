@@ -13,6 +13,9 @@ using DDAC3.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using DDAC3.Models;
+using DDAC3.Services;
+using Microsoft.Azure.Cosmos.Fluent;
+using Microsoft.Azure.Cosmos;
 
 namespace DDAC3
 {
@@ -28,6 +31,25 @@ namespace DDAC3
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
+
+             async Task<CosmosDBService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
+            {
+                string databaseName = configurationSection.GetSection("DatabaseName").Value;
+                string containerName = configurationSection.GetSection("ContainerName").Value;
+                string account = configurationSection.GetSection("Account").Value;
+                string key = configurationSection.GetSection("Key").Value;
+                CosmosClientBuilder clientBuilder = new CosmosClientBuilder(account, key);
+                CosmosClient client = clientBuilder
+                                    .WithConnectionModeDirect()
+                                    .Build();
+                CosmosDBService cosmosDbService = new CosmosDBService(client, databaseName, containerName);
+                DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
+                await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
+
+                return cosmosDbService;
+            }
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
